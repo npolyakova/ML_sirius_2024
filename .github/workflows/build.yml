@@ -16,4 +16,4 @@ jobs:
       - name: run app
         run: |
           cd ./src
-          docker compose up
+          sudo docker compose up
