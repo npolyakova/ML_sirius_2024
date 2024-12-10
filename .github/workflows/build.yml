@@ -13,6 +13,6 @@ jobs:
 
       - name: run app
         run: |
-          cd ./backend
-          sudo docker build -t buildedapp .
+          cd ./src
+          sudo docker build -t my_build .
           docker-compose up
