@@ -19,5 +19,5 @@ jobs:
       - name: run app
         run: |
           cd ./src
-          sudo docker build -t my_build .
+          docker build -t my_build .
           docker compose up
