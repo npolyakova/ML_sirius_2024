@@ -1,5 +1,5 @@
 services:
   app:
-    image: ml_build
+    build: ./src
     ports:
       - "8080:8080"
