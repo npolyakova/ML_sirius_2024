@@ -1,0 +1,18 @@
+name: build
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: run app
+        run: |
+          cd ./backend
+          sudo docker build -t buildedapp .
+          docker-compose up
