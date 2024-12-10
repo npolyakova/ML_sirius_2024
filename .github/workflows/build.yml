@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: self-hosted
-    container:
-      image: docker:27.4.0
       
     steps:
       - uses: actions/checkout@v4
