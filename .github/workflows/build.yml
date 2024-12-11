@@ -8,18 +8,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    container:
-      image: docker:27.4.0
+    runs-on: self-hosted
       
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
 
       - name: run app
         run: |
           cd ./src
-          docker build -t my_build .
-          docker compose up
+          sudo docker compose up -d
