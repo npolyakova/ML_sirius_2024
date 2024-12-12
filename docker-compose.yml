@@ -17,7 +17,7 @@ services:
       - mldb-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    network_mode: "host"
+    #network_mode: "host"
 
 volumes:
   mldb-data:
