@@ -12,14 +12,14 @@ def get_categories():
         print('Can`t establish connection to database')
 
     cursor = conn.cursor()
-    cursor.execute('SELECT name FROM categories')
+    cursor.execute('SELECT * FROM categories')
     all_cats = cursor.fetchall()
     cursor.close()
     conn.close()
 
     pre_json = []
     for item in all_cats:
-        pre_json.append(item[0])
+        pre_json.append({"id": item[0], "name": item[1]})
 
     return pre_json
 
