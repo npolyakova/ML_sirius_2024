@@ -30,7 +30,7 @@ def get_suggest(category1: str, category2: str):
         print('Can`t establish connection to database')
 
     cursor = conn.cursor()
-    cursor.execute(f'SELECT next_category FROM categories WHERE category1 = {category1} AND category2 = {category2}')
+    cursor.execute(f'SELECT next_category FROM mapping WHERE category_1 = {category1} AND category_2 = {category2}')
     next_cat = cursor.fetchone()
     cursor.close()
     conn.close()
