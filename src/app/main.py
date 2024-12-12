@@ -8,7 +8,7 @@ app = FastAPI()
 def get_categories():
     conn = None
     try:
-        conn = psycopg2.connect('postgresql://ml_user:pgpass@176.108.253.3:5432/mldb')
+        conn = psycopg2.connect('postgresql://ml_user:pgpass@localhost:5432/mldb')
     except:
         print('Can`t establish connection to database')
 
