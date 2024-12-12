@@ -41,7 +41,7 @@ def get_suggest(category1: str, category2: str):
     cursor.close()
     conn.close()
 
-    return {"id": next_cat_id}
+    return {"id": next_cat_id[0]}
 
 def get_product(category_id: int):
     try:
