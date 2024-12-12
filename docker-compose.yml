@@ -3,8 +3,6 @@ services:
     build: ./src
     ports:
       - "8080:8080"
-    networks:
-      - dev
 
   postgres:
     image: postgres:16
@@ -12,23 +10,13 @@ services:
       POSTGRES_DB: "mldb"
       POSTGRES_USER: "ml_user"
       POSTGRES_PASSWORD: "pgpass"
+      POSTGRES_HOST: "127.0.0.1"
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
       - ../2. Init Database:/docker-entrypoint-initdb.d
       - mldb-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    networks:
-      - dev
 
 volumes:
   mldb-data:
-
-networks:
-  dev:
-#    driver: bridge
-#    ipam:
-#      config:
-#        - subnet: 192.168.100.0/24
-#    driver_opts:
-#      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
