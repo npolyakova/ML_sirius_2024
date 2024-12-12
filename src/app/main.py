@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 import psycopg2
@@ -32,10 +32,35 @@ def get_suggest(category1: str, category2: str):
     cursor = conn.cursor()
     cursor.execute(f'SELECT next_category FROM mapping WHERE category_1 = {category1} AND category_2 = {category2}')
     next_cat = cursor.fetchone()
+
+    if next_cat is None:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    cursor.execute(f'SELECT id FROM categories WHERE name = {next_cat[0]}')
+    next_cat_id = cursor.fetchone()
     cursor.close()
     conn.close()
 
-    return {"id": next_cat[0], "name": next_cat[1]}
+    return {"id": next_cat_id}
+
+def get_product(category_id: int):
+    try:
+        conn = psycopg2.connect('postgresql://ml_user:pgpass@localhost:5432/mldb')
+    except:
+        print('Can`t establish connection to database')
+
+    cursor = conn.cursor()
+    cursor.execute(f'SELECT name, link FROM products WHERE category_id = {category_id}')
+    products = cursor.fetchall()
+
+    if products is None:
+        raise HTTPException(status_code=404, detail="Products for this category not found")
+
+    pre_json = []
+    for item in products:
+        pre_json.append({"name": item[0], "link": item[1]})
+
+    return pre_json
 
 @app.get("/")
 def read_root():
@@ -48,6 +73,12 @@ def get_all_categories():
     return JSONResponse(content=json_compatible_item_data)
 
 @app.get("/suggest")
-def get_model(category1, category2):
+def get_suggested_category(category1: str, category2: str):
     json_compatible_item_data = jsonable_encoder(get_suggest(category1, category2))
+    return JSONResponse(content=json_compatible_item_data)
+
+@app.get("/product")
+def get_next_product(category_id: int):
+    prod_dict = {"products": get_product(category_id)}
+    json_compatible_item_data = jsonable_encoder(prod_dict)
     return JSONResponse(content=json_compatible_item_data)
