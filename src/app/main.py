@@ -6,6 +6,7 @@ import psycopg2
 app = FastAPI()
 
 def get_categories():
+    conn = None
     try:
         conn = psycopg2.connect('postgresql://ml_user:pgpass@176.108.253.3:5432/mldb')
     except:
@@ -28,7 +29,7 @@ def read_root():
     return {"message" : "This is the api for education ML project"}
 
 @app.get("/categories")
-def parse_items():
+def get_all_categories():
     cat_dict = {"categories": get_categories()}
     json_compatible_item_data = jsonable_encoder(cat_dict)
     return JSONResponse(content=json_compatible_item_data)
