@@ -1,3 +1,5 @@
+from operator import index
+
 import requests
 import pandas as pd
 import csv
@@ -53,6 +55,27 @@ def get_data_from_json(json_file: dict, category: str) -> list:
         brand = data.get('brand')
         rating = data.get('rating')
         category = category
+
+        first_id = str(sku)[:4]
+        second_id = str(sku)[:6]
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0)"}
+        url = None
+        start_basket = int(first_id) // 250
+        for i in range (start_basket, 21):
+            if i < 10:
+                index = f'0{i}'
+            else:
+                index = i
+
+            url = f"https://basket-{index}.wbbasket.ru/vol{first_id}/part{second_id}/{sku}/images/big/1.webp"
+            print(url)
+            r = requests.get(url, headers=headers)
+            if r.status_code == 200:
+                break
+            else:
+                url = None
+
+        image = url
         data_list.append({
             'id': sku,
             'name': name,
@@ -60,7 +83,8 @@ def get_data_from_json(json_file: dict, category: str) -> list:
             'brand': brand,
             'rating': rating,
             'link': f'https://www.wildberries.ru/catalog/{data.get("id")}/detail.aspx?targetUrl=BP',
-            'category': category['name']
+            'category': category['name'],
+            'image': image
         })
     return data_list
 
@@ -101,9 +125,8 @@ def parser():
             )
             if data != {}:
                 products_list = get_data_from_json(data, category)
-                for i in range (0, 10):
+                for i in range (0, 1):
                     data_list.append(products_list[i])
-
             print(category['name'])
 
         print(f'Сбор данных завершен. Собрано: {len(data_list)} товаров.')
