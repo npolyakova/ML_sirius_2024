@@ -26,7 +26,13 @@ def save_csv(data: list, file_name: str):
     f = open(file_name, 'w', encoding="utf-8")
 
     writer = csv.writer(f)
-    writer.writerow(data)
+
+    writer.writerow(["id","name","price","brand","rating","link","category"])
+
+    while data:
+        row = data.pop()
+        writer.writerow(row.values())
+
     f.close()
 
 def search_category_in_catalog(url: str, catalog_list: list) -> dict:
@@ -40,7 +46,7 @@ def search_category_in_catalog(url: str, catalog_list: list) -> dict:
 def get_data_from_json(json_file: dict, category: str) -> list:
     """извлекаем из json данные"""
     data_list = []
-    for data in json_file['data']['products.csv']:
+    for data in json_file['data']['products']:
         sku = data.get('id')
         name = data.get('name')
         price = int(data.get("priceU") / 100)
@@ -77,10 +83,10 @@ def scrap_page(page: int, shard: str, query: str) -> dict:
 def parser():
     # Сохраняем категории в эксель
     catalog_data = get_data_category(get_catalogs_wb())
-    try:
-        save_csv(catalog_data, "categories.csv")
-    except PermissionError:
-        print('Ошибка! Вы забыли закрыть созданный ранее excel файл. Закройте и повторите попытку')
+    # try:
+    #     save_csv(catalog_data, "categories.csv")
+    # except PermissionError:
+    #     print('Ошибка! Вы забыли закрыть созданный ранее excel файл. Закройте и повторите попытку')
 
     # Сохраняем товары в эксель
     # поиск введенной категории в общем каталоге
@@ -102,7 +108,7 @@ def parser():
 
         print(f'Сбор данных завершен. Собрано: {len(data_list)} товаров.')
     # сохранение найденных данных
-        save_csv(data_list, "products.csv.csv")
+        save_csv(data_list, "products.csv")
     except PermissionError:
         print('Ошибка! Повторите попытку')
 
