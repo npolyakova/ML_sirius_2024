@@ -34,7 +34,7 @@ def get_suggest(category1: str, category2: str):
     next_cat = cursor.fetchone()
 
     if next_cat is None:
-        raise HTTPException(status_code=404, detail="Category not found")
+        return {"id: 1"}
 
     cursor.execute("SELECT id FROM categories WHERE name = '" + next_cat[0] + "'")
     next_cat_id = cursor.fetchone()
