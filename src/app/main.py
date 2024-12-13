@@ -50,7 +50,7 @@ def get_product(category_id: int):
         print('Can`t establish connection to database')
 
     cursor = conn.cursor()
-    cursor.execute(f'SELECT name, link FROM products WHERE category_id = {category_id}')
+    cursor.execute(f'SELECT name, link, image_link FROM products WHERE category_id = {category_id}')
     products = cursor.fetchall()
 
     if products is None:
@@ -58,7 +58,7 @@ def get_product(category_id: int):
 
     pre_json = []
     for item in products:
-        pre_json.append({"name": item[0], "link": item[1]})
+        pre_json.append({"name": item[0], "link": item[1], "image_link": item[2]})
 
     return pre_json
 
