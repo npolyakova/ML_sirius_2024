@@ -1,7 +1,4 @@
-from operator import index
-
 import requests
-import pandas as pd
 import csv
 
 def get_catalogs_wb() -> dict:
@@ -31,8 +28,9 @@ def save_csv(data: list, file_name: str):
 
     writer.writerow(["id","name","price","brand","rating","link","category"])
 
-    while data:
-        row = data.pop()
+    items = data[:]
+    while items:
+        row = items.pop()
         writer.writerow(row.values())
 
     f.close()
@@ -48,44 +46,49 @@ def search_category_in_catalog(url: str, catalog_list: list) -> dict:
 def get_data_from_json(json_file: dict, category: str) -> list:
     """извлекаем из json данные"""
     data_list = []
+    count = 0
     for data in json_file['data']['products']:
-        sku = data.get('id')
-        name = data.get('name')
-        price = int(data.get("priceU") / 100)
-        brand = data.get('brand')
-        rating = data.get('rating')
-        category = category
+        if count != 10:
+            sku = data.get('id')
+            name = data.get('name')
+            price = int(data.get("priceU") / 100)
+            brand = data.get('brand')
+            rating = data.get('rating')
+            category = category
 
-        first_id = str(sku)[:4]
-        second_id = str(sku)[:6]
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0)"}
-        url = None
-        start_basket = int(first_id) // 250
-        for i in range (start_basket, 21):
-            if i < 10:
-                index = f'0{i}'
-            else:
-                index = i
+            first_id = str(sku)[:4]
+            second_id = str(sku)[:6]
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0)"}
+            url = None
+            start_basket = int(first_id) // 250
+            for i in range (start_basket, 21):
+                if i < 10:
+                    index = f'0{i}'
+                else:
+                    index = i
 
-            url = f"https://basket-{index}.wbbasket.ru/vol{first_id}/part{second_id}/{sku}/images/big/1.webp"
-            print(url)
-            r = requests.get(url, headers=headers)
-            if r.status_code == 200:
-                break
-            else:
-                url = None
+                url = f"https://basket-{index}.wbbasket.ru/vol{first_id}/part{second_id}/{sku}/images/big/1.webp"
+                print(url)
+                r = requests.get(url, headers=headers)
+                if r.status_code == 200:
+                    break
+                else:
+                    url = None
 
-        image = url
-        data_list.append({
-            'id': sku,
-            'name': name,
-            'price': price,
-            'brand': brand,
-            'rating': rating,
-            'link': f'https://www.wildberries.ru/catalog/{data.get("id")}/detail.aspx?targetUrl=BP',
-            'category': category['name'],
-            'image': image
-        })
+            image = url
+            data_list.append({
+                'id': sku,
+                'name': name,
+                'price': price,
+                'brand': brand,
+                'rating': rating,
+                'link': f'https://www.wildberries.ru/catalog/{data.get("id")}/detail.aspx?targetUrl=BP',
+                'category': category['name'],
+                'image': image
+            })
+            count += 1
+        else:
+            break
     return data_list
 
 def scrap_page(page: int, shard: str, query: str) -> dict:
@@ -105,15 +108,12 @@ def scrap_page(page: int, shard: str, query: str) -> dict:
         return {}
 
 def parser():
-    # Сохраняем категории в эксель
     catalog_data = get_data_category(get_catalogs_wb())
-    # try:
-    #     save_csv(catalog_data, "categories.csv")
-    # except PermissionError:
-    #     print('Ошибка! Вы забыли закрыть созданный ранее excel файл. Закройте и повторите попытку')
+    try:
+        save_csv(catalog_data, "categories.csv")
+    except PermissionError:
+        print('Ошибка!')
 
-    # Сохраняем товары в эксель
-    # поиск введенной категории в общем каталоге
     data_list = []
 
     try:
@@ -125,12 +125,11 @@ def parser():
             )
             if data != {}:
                 products_list = get_data_from_json(data, category)
-                for i in range (0, 1):
+                for i in range (0, 2):
                     data_list.append(products_list[i])
             print(category['name'])
 
         print(f'Сбор данных завершен. Собрано: {len(data_list)} товаров.')
-    # сохранение найденных данных
         save_csv(data_list, "products.csv")
     except PermissionError:
         print('Ошибка! Повторите попытку')
