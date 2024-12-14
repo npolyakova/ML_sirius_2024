@@ -3,6 +3,7 @@ services:
     build: ./src
     ports:
       - "8080:8080"
+    network_mode: "host"
 
   postgres:
     image: postgres:16
@@ -16,6 +17,7 @@ services:
       - mldb-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    #network_mode: "host"
 
 volumes:
   mldb-data:
